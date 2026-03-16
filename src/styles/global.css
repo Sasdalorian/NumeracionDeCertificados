@@ -1,0 +1,29 @@
+@import '@radix-ui/themes/styles.css';
+
+:root {
+    --bg-color: #003a70;
+    
+    --font-verdana: 'Verdana', sans-serif;
+    
+}
+
+html, .radix-themes {
+    background-color: var(--bg-color) !important;
+}
+
+.verdanatext {
+    font-family: var(--font-verdana);
+    text-align: center;
+    color: white;
+}
+
+.ancho5rem {
+    width: 5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
