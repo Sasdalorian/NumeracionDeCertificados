@@ -1,0 +1,54 @@
+@import '@radix-ui/themes/styles.css';
+
+:root {
+    --bg-color: #003a70;
+    
+    --font-verdana: 'Verdana', sans-serif;
+    
+}
+
+html, .radix-themes {
+    background-color: var(--bg-color) !important;
+}
+
+header {
+    position: relative;
+    width: 100%;
+    height: 120px; /* Ajusta según el tamaño del logo */
+}
+
+.logo-esquina {
+    position: absolute;
+    top: -0.5rem;
+    left: 2rem;
+    width: 14rem;
+    height: 8rem;
+}
+
+.titulo-centro {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    right: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 60%;
+    font-size: 2.5rem;
+}
+
+.verdanatext {
+    font-family: var(--font-verdana);
+    text-align: center;
+    color: white;
+}
+
+.ancho5rem {
+    width: 5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
