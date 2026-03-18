@@ -2,9 +2,10 @@
 import { Button } from '@radix-ui/themes';
 
 ---
-<section>
-    <h1 class="verdanatext">Enumerar Certificados Historicos</h1>
-</section>
+<header>
+  <img src="/LogoHCVB.jpg" alt="Logo HCVB" class="logo-esquina">
+  <h1 class="verdanatext titulo-centro">Enumerar Certificados Historicos</h1>
+</header>
 
 <form class="form verdanatext" id="pdfForm">
 
@@ -19,8 +20,58 @@ import { Button } from '@radix-ui/themes';
     <Button type="submit" variant="solid" size="2">Enumerar</Button>
 </form>
 
-<div id="result"></div>
+<section class="verdanatext">
+    <h3>Manual de uso</h3>
+
+    <p>1. Este Enumerador de Certificados permite enumerar archivos pdf.</p>
+    <p>2. Para enumerar los certificados en orden, estos deben estar ordenados alfabéticamente por nombre de archivo.</p>
+    <p>3. El número inicial designa el primer certificado con el número seleccionado.</p>
+    <p>4. Al hacer click en enumerar, los pdf seleccionados se descargaran con el mismo nombre pero con el número de certificado agregado al final del nombre del archivo.</p>
+    <p>5. Los certificados quedarán guardados en la carpeta "Descargas" de su computador.</p>
+    <p>6. Sea feliz enumerando certificados!</p>
+</section>
 
 <script type="module">
+import { PDFDocument, rgb, StandardFonts } from 'https://cdn.skypack.dev/pdf-lib@1.17.1';
 
+document.getElementById('pdfForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const files = document.querySelector('input[type="file"][name="pdfs"]').files;
+    const numeroInicial = parseInt(document.getElementById('numeroInicial').value, 10);
+
+    const filesArr = Array.from(files).sort((a, b) => a.name.localeCompare(b.name));
+    for (let i = 0; i < filesArr.length; i++) {
+        const file = filesArr[i];
+        const numero = numeroInicial + i;
+        const texto = `CRT. N° ${numero}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        const pages = pdfDoc.getPages();
+
+        if (pages.length > 0) {
+            const firstPage = pages[0];
+            const { width, height } = firstPage.getSize();
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            firstPage.drawText(texto, {
+                x: 20,
+                y: height - 30,
+                size: 14,
+                font: font,
+                color: rgb(0, 0, 0)
+            });
+        }
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    document.getElementById('pdfForm').reset();
+});
 </script>
