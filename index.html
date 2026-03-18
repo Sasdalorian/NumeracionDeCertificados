@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/src/styles/global.css"><meta name="generator" content="Astro v6.0.5"><title>Enumerar Certificados Historicos</title></head> <body> <div data-is-root-theme="true" data-accent-color="indigo" data-gray-color="slate" data-has-background="true" data-panel-background="translucent" data-radius="medium" data-scaling="100%" class="radix-themes">  <header> <img src="/LogoHCVB.jpg" alt="Logo HCVB" class="logo-esquina"> <h1 class="verdanatext titulo-centro">Enumerar Certificados Historicos</h1> </header> <form class="form verdanatext" id="pdfForm"> <label>Selecciona los archivos PDF que desea enumerar:</label> <input type="file" accept="application/pdf" multiple name="pdfs" required> <div> <label>Número inicial:</label> <input type="number" id="numeroInicial" min="1" class="ancho5rem" required> </div> <button data-accent-color="" type="submit" class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-solid rt-Button">Enumerar</button> </form> <section class="verdanatext"> <h3>Manual de uso</h3> <p>1. Este Enumerador de Certificados permite enumerar archivos pdf.</p> <p>2. Para enumerar los certificados en orden, estos deben estar ordenados alfabéticamente por nombre de archivo.</p> <p>3. El número inicial designa el primer certificado con el número seleccionado.</p> <p>4. Al hacer click en enumerar, los pdf seleccionados se descargaran con el mismo nombre pero con el número de certificado agregado al final del nombre del archivo.</p> <p>5. Los certificados quedarán guardados en la carpeta "Descargas" de su computador.</p> <p>6. Sea feliz enumerando certificados!</p> </section> <script type="module">
+import { PDFDocument, rgb, StandardFonts } from 'https://cdn.skypack.dev/pdf-lib@1.17.1';
+
+document.getElementById('pdfForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const files = document.querySelector('input[type="file"][name="pdfs"]').files;
+    const numeroInicial = parseInt(document.getElementById('numeroInicial').value, 10);
+
+    const filesArr = Array.from(files).sort((a, b) => a.name.localeCompare(b.name));
+    for (let i = 0; i < filesArr.length; i++) {
+        const file = filesArr[i];
+        const numero = numeroInicial + i;
+        const texto = `CRT. N° ${numero}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        const pages = pdfDoc.getPages();
+
+        if (pages.length > 0) {
+            const firstPage = pages[0];
+            const { width, height } = firstPage.getSize();
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            firstPage.drawText(texto, {
+                x: 20,
+                y: height - 30,
+                size: 14,
+                font: font,
+                color: rgb(0, 0, 0)
+            });
+        }
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    document.getElementById('pdfForm').reset();
+});
+</script>  </div> </body></html>
